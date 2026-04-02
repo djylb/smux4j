@@ -215,7 +215,6 @@ public class Smux4jTest {
             assertNotNull(stream.getInputStream());
             assertNotNull(stream.getOutputStream());
             assertSame(session, stream.getSession());
-            assertTrue(stream instanceof ByteChannel);
             assertTrue(stream.isOpen());
             assertTrue(session.isOpen());
         } finally {

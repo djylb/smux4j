@@ -1,8 +1,10 @@
+import org.gradle.api.publish.maven.MavenPublication
+
 apply plugin: 'java-library'
 apply plugin: 'maven-publish'
 
 group = 'io.github.djylb'
-version = '0.1.0'
+version = '0.1.1'
 
 repositories {
     mavenCentral()
@@ -18,8 +20,8 @@ tasks.withType(JavaCompile).configureEach {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            from components.java
+        create('mavenJava', MavenPublication) {
+            from components.getByName('java')
             artifactId = 'smux4j'
         }
     }

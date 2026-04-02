@@ -2,7 +2,6 @@ package io.github.djylb.smux4j;
 
 import io.github.djylb.smux4j.exception.GoAwayException;
 import io.github.djylb.smux4j.exception.InvalidProtocolException;
-import io.github.djylb.smux4j.exception.SmuxTimeoutException;
 import io.github.djylb.smux4j.frame.Command;
 import io.github.djylb.smux4j.frame.Frame;
 import io.github.djylb.smux4j.frame.RawHeader;
@@ -16,7 +15,6 @@ import io.github.djylb.smux4j.internal.WriteRequest;
 import io.github.djylb.smux4j.internal.WriteResult;
 import io.github.djylb.smux4j.util.LittleEndian;
 
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,10 +83,6 @@ public final class Session implements Flushable, Channel {
     private volatile long nextStreamId;
     private volatile Instant acceptDeadline;
 
-    private final Thread recvThread;
-    private final Thread sendThread;
-    private final Thread keepAliveThread;
-
     private Session(SmuxConnection connection, Config config, boolean client) throws IOException {
         this.connection = Objects.requireNonNull(connection, "connection");
         this.input = connection.getInputStream();
@@ -101,19 +95,19 @@ public final class Session implements Flushable, Channel {
         this.keepAliveIntervalMillis = this.config.getKeepAliveIntervalMillis();
         this.keepAliveTimeoutMillis = this.config.getKeepAliveTimeoutMillis();
 
-        this.recvThread = newThread("smux4j-recv-" + sessionNumber, new Runnable() {
+        Thread recvThread = newThread("smux4j-recv-" + sessionNumber, new Runnable() {
             @Override
             public void run() {
                 recvLoop();
             }
         });
-        this.sendThread = newThread("smux4j-send-" + sessionNumber, new Runnable() {
+        Thread sendThread = newThread("smux4j-send-" + sessionNumber, new Runnable() {
             @Override
             public void run() {
                 sendLoop();
             }
         });
-        this.keepAliveThread = this.config.isKeepAliveDisabled() ? null : newThread("smux4j-keepalive-" + sessionNumber, new Runnable() {
+        Thread keepAliveThread = this.config.isKeepAliveDisabled() ? null : newThread("smux4j-keepalive-" + sessionNumber, new Runnable() {
             @Override
             public void run() {
                 keepAliveLoop();
@@ -359,12 +353,7 @@ public final class Session implements Flushable, Channel {
                 throw new ClosedChannelException();
             }
 
-            long waitMillis;
-            try {
-                waitMillis = DeadlineSupport.waitSliceMillis(deadline, LOOP_WAIT_SLICE_MILLIS);
-            } catch (SmuxTimeoutException exception) {
-                throw exception;
-            }
+            long waitMillis = DeadlineSupport.waitSliceMillis(deadline, LOOP_WAIT_SLICE_MILLIS);
 
             try {
                 Stream stream = accepts.poll(waitMillis, TimeUnit.MILLISECONDS);
@@ -583,10 +572,7 @@ public final class Session implements Flushable, Channel {
             long now = System.currentTimeMillis();
             long sleepMillis = Math.min(nextPingAt - now, nextTimeoutAt - now);
             if (sleepMillis > 0L) {
-                try {
-                    Thread.sleep(Math.min(sleepMillis, LOOP_WAIT_SLICE_MILLIS));
-                } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
+                if (awaitClose(Math.min(sleepMillis, LOOP_WAIT_SLICE_MILLIS))) {
                     return;
                 }
                 continue;
@@ -697,8 +683,7 @@ public final class Session implements Flushable, Channel {
                 if (cause instanceof IOException) {
                     throw (IOException) cause;
                 }
-                IOException failure = new IOException("write failed", cause);
-                throw failure;
+                throw new IOException("write failed", cause);
             }
         }
     }
@@ -733,6 +718,20 @@ public final class Session implements Flushable, Channel {
                 return;
             }
             shaperQueue.push(request);
+        }
+    }
+
+    private boolean awaitClose(long waitMillis) {
+        try {
+            closeFuture.get(waitMillis, TimeUnit.MILLISECONDS);
+            return true;
+        } catch (TimeoutException ignored) {
+            return false;
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            return true;
+        } catch (ExecutionException ignored) {
+            return true;
         }
     }
 

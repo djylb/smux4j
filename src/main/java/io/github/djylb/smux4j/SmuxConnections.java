@@ -29,7 +29,7 @@ public final class SmuxConnections {
 
     public static SmuxConnection of(ByteChannel channel) {
         Objects.requireNonNull(channel, "channel");
-        return of((ReadableByteChannel) channel, (WritableByteChannel) channel);
+        return of(channel, channel);
     }
 
     public static SmuxConnection of(ReadableByteChannel input, WritableByteChannel output) {

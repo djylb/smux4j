@@ -1,7 +1,6 @@
 package io.github.djylb.smux4j;
 
 import io.github.djylb.smux4j.exception.ConsumedException;
-import io.github.djylb.smux4j.exception.SmuxTimeoutException;
 import io.github.djylb.smux4j.frame.Command;
 import io.github.djylb.smux4j.frame.Frame;
 import io.github.djylb.smux4j.frame.UpdateHeader;
@@ -10,7 +9,6 @@ import io.github.djylb.smux4j.internal.BufferRing;
 import io.github.djylb.smux4j.internal.DeadlineSupport;
 import io.github.djylb.smux4j.internal.WriteClass;
 
-import java.io.Closeable;
 import java.io.Flushable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Logical stream within a session.
  */
-public final class Stream implements Closeable, Flushable, ByteChannel {
+public final class Stream implements Flushable, ByteChannel {
     private static final int WOULD_BLOCK = -2;
     private static final long WAIT_SLICE_MILLIS = 100L;
 

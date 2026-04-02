@@ -13,7 +13,6 @@ import org.junit.Test;
 import java.util.concurrent.CompletableFuture;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -67,6 +66,8 @@ public class InternalStructureTest {
 
         BufferRing.Entry second = ring.pop();
         BufferRing.Entry third = ring.pop();
+        assertNotNull(second);
+        assertNotNull(third);
         assertSame(two, second.getOwnerBuffer());
         assertSame(three, third.getOwnerBuffer());
         assertTrue(ring.isEmpty());

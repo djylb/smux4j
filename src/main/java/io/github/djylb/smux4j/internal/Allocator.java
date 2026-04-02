@@ -38,7 +38,7 @@ public final class Allocator {
         }
 
         int capacity = buffer.length;
-        if (capacity <= 0 || capacity > 65_536) {
+        if (capacity == 0 || capacity > 65_536) {
             throw new IllegalArgumentException("allocator release() incorrect buffer size");
         }
 

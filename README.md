@@ -1,5 +1,7 @@
 # smux4j
 
+[English](./README.md) | [中文](./README.zh.md)
+
 ## Installation
 
 Gradle Kotlin DSL:
@@ -13,7 +15,7 @@ dependencyResolutionManagement {
 }
 
 dependencies {
-    implementation("com.github.djylb:smux4j:v0.1.0")
+    implementation("com.github.djylb:smux4j:v0.1.1")
 }
 ```
 
@@ -28,11 +30,11 @@ dependencyResolutionManagement {
 }
 
 dependencies {
-    implementation 'com.github.djylb:smux4j:v0.1.0'
+    implementation 'com.github.djylb:smux4j:v0.1.1'
 }
 ```
 
-Current version: `v0.1.0`
+Current version: `v0.1.1`
 
 ## Usage
 

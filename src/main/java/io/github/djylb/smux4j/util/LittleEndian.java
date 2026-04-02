@@ -31,10 +31,8 @@ public final class LittleEndian {
     }
 
     public static void writeInt(byte[] data, int offset, int value) {
-        data[offset] = (byte) (value & 0xff);
-        data[offset + 1] = (byte) ((value >>> 8) & 0xff);
-        data[offset + 2] = (byte) ((value >>> 16) & 0xff);
-        data[offset + 3] = (byte) ((value >>> 24) & 0xff);
+        writeUnsignedShort(data, offset, value);
+        writeUnsignedShort(data, offset + 2, value >>> 16);
     }
 
     public static void writeUnsignedInt(byte[] data, int offset, long value) {

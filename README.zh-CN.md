@@ -1,8 +1,8 @@
 # smux4j
 
-## Installation
+## 安装
 
-Gradle Kotlin DSL:
+Gradle Kotlin DSL：
 
 ```kotlin
 dependencyResolutionManagement {
@@ -17,7 +17,7 @@ dependencies {
 }
 ```
 
-Gradle Groovy DSL:
+Gradle Groovy DSL：
 
 ```groovy
 dependencyResolutionManagement {
@@ -32,11 +32,11 @@ dependencies {
 }
 ```
 
-Current version: `v0.1.0`
+当前版本：`v0.1.0`
 
-## Usage
+## 使用
 
-Default config:
+默认配置：
 
 ```java
 import io.github.djylb.smux4j.Session;
@@ -58,7 +58,7 @@ try (Session session = Smux.client(socket);
 }
 ```
 
-Custom config:
+自定义配置：
 
 ```java
 import io.github.djylb.smux4j.Config;
@@ -79,7 +79,7 @@ Config config = Config.builder()
 Session session = Smux.client(socket, config);
 ```
 
-Server side:
+服务端：
 
 ```java
 import io.github.djylb.smux4j.Session;
@@ -99,6 +99,6 @@ try (Session session = Smux.server(socket)) {
 }
 ```
 
-`Smux.client(...)` and `Smux.server(...)` also accept `InputStream`/`OutputStream`, `ByteChannel`, and split `ReadableByteChannel`/`WritableByteChannel`.
+`Smux.client(...)` 和 `Smux.server(...)` 也支持 `InputStream`/`OutputStream`、`ByteChannel`，以及分开的 `ReadableByteChannel`/`WritableByteChannel`。
 
-Original smux: [xtaci/smux](https://github.com/xtaci/smux)
+原版 smux：[xtaci/smux](https://github.com/xtaci/smux)

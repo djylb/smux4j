@@ -60,7 +60,9 @@ try (Session session = Smux.server(socket)) {
     try (Stream stream = session.acceptStream()) {
         byte[] buffer = new byte[1024];
         int n = stream.read(buffer);
-        stream.write(buffer, 0, n);
+        if (n != -1) {
+            stream.write(buffer, 0, n);
+        }
     }
 }
 ```
